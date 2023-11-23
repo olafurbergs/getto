@@ -30,6 +30,5 @@ jobs:
         prerelease: false
         release_name: 0.0.1
         tag_name: ${{ github.ref }}
-        body_path: CHANGELOG.md
       env:
         GITHUB_TOKEN: ${{ github.token }}
