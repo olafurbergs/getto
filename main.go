@@ -260,10 +260,11 @@ func fetchUserToken(profile Profile) string {
 		params.Encode())
 
 	if err == nil {
-		print(string(data))
+		fmt.Println(string(data))
 		response := AuthResponse{}
 		if err = json.Unmarshal(data, &response); err == nil {
 			// happy end: token parsed successfully
+			fmt.Println()
 			return response.AccessToken
 		}
 	}
