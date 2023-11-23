@@ -1,5 +1,5 @@
 # Get To(ken)
-A command line tool to get a token from a oauth2 server
+A command line tool to get a token from a oauth2 server through authorization flow (browser flow)
 
 ## Install
 
