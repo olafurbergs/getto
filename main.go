@@ -150,7 +150,6 @@ func doPostRequest(url string, body string) ([]byte, error) {
 		fmt.Printf("client: could not create request: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("able to create request to", url)
 
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := http.DefaultClient.Do(req)
@@ -163,12 +162,10 @@ func doPostRequest(url string, body string) ([]byte, error) {
 		fmt.Printf("client: could not read response body: %s\n", err)
 		os.Exit(1)
 	}
-	println("able to make request")
 	return resBody, nil
 }
 
 func fetchUserToken(profile Profile) string {
-	fmt.Println(profile.AuthorizationUrl)
 
 	const (
 		redirectURL = "http://localhost:4200"
@@ -214,7 +211,7 @@ func fetchUserToken(profile Profile) string {
 			}
 		}
 		// redirect user's browser to spotify home page
-		http.Redirect(w, r, "https://www.spotify.com/", http.StatusSeeOther)
+		http.Redirect(w, r, "https://media.tenor.com/lUa20gCxERoAAAAC/seems-legit.gif", http.StatusSeeOther)
 	})
 
 	// open user's browser to login page
