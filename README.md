@@ -4,7 +4,7 @@ A command line tool to get a token from a oauth2 server through authorization fl
 ## Install
 
 ```
-go get -u github.com/olafurbergs/getto
+wget -O ~/bin/getto https://github.com/olafurbergs/getto/releases/download/{version}/getto_linux_amd64 && chmod u+x ~/bin/getto
 ```
 
 ## Usage
