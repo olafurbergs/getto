@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/grokify/go-pkce"
 	"github.com/pkg/browser"
 	"gopkg.in/yaml.v2"
 )
@@ -22,9 +23,10 @@ type Profiles struct {
 }
 
 type Profile struct {
+	PKCE             bool              `yaml:"pkce"`
 	AuthorizationUrl string            `yaml:"authorizationUrl"`
 	ClientId         string            `yaml:"clientId"`
-	ClientSecret     string            `yaml:"clientSecret"`
+	ClientSecret     string            `yaml:"clientSecret,omitempty"`
 	Scopes           string            `yaml:"scopes"`
 	TokenUrl         string            `yaml:"tokenUrl"`
 	Params           map[string]string `yaml:"params"`
@@ -75,6 +77,7 @@ func main() {
 			Params: map[string]string{},
 		}
 
+		profile.PKCE = false
 		profile.AuthorizationUrl = "https://accounts.google.com/o/oauth2/v2/auth"
 		profile.ClientId = "589478345472-afh60s6u44ikncmonmtk4h6rl23ipdr8.apps.googleusercontent.com"
 		profile.ClientSecret = "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"
@@ -196,6 +199,13 @@ func fetchUserToken(profile Profile) string {
 	// loginURL
 	path := fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=%s&nonce=%s%s", profile.AuthorizationUrl, profile.ClientId, redirectURL, scope, state, nonce, eparams)
 
+	// PKCE code challenge and verifier
+	codeVerifier, _ := pkce.NewCodeVerifier(96)
+	if profile.PKCE {
+		codeChallenge := pkce.CodeChallengeS256(codeVerifier)
+		path = fmt.Sprintf("%s&%s=%s&code_challenge_method=%s", path, pkce.ParamCodeChallenge, codeChallenge, pkce.MethodS256)
+	}
+
 	// channel for signaling that server shutdown can be done
 	messages := make(chan bool)
 
@@ -238,7 +248,12 @@ func fetchUserToken(profile Profile) string {
 	params.Add("code", code)
 	params.Add("redirect_uri", redirectURL)
 	params.Add("client_id", profile.ClientId)
-	params.Add("client_secret", profile.ClientSecret)
+	if len(profile.ClientSecret) != 0 {
+		params.Add("client_secret", profile.ClientSecret)
+	}
+	if profile.PKCE {
+		params.Add(pkce.ParamCodeVerifier, codeVerifier)
+	}
 
 	data, err := doPostRequest(
 		profile.TokenUrl,
