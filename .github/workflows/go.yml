@@ -22,8 +22,14 @@ jobs:
       with:
         go-version: '1.20'
 
-    - name: Build
-      run: go build -v ./...
+    - name: Generate build files
+      uses: thatisuday/go-cross-build@v1
+      with:
+          platforms: 'linux/amd64, darwin/amd64, windows/amd64'
+          package: 'getto'
+          name: 'getto'
+          compress: 'true'
+          dest: 'dist'
 
     - name: release
       uses: actions/create-release@v1
@@ -37,13 +43,33 @@ jobs:
           Preliminary version
       env:
         GITHUB_TOKEN: ${{ github.token }}
-    - name: Upload Release Asset
-      id: upload-release-asset 
+    - name: Upload Linux Release Asset
+      id: upload-linux-release-asset 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./getto
-        asset_name: getto_linux_amd64
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/getto_linux_amd64.tar.gz
+        asset_name: getto_linux_amd64.tar.gz
+        asset_content_type: application/octet-stream
+    - name: Upload Darwin Release Asset
+      id: upload-darwin-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/getto_darwin_amd64.tar.gz
+        asset_name: getto_darwin_amd64.tar.gz
+        asset_content_type: application/octet-stream
+    - name: Upload Windows Release Asset
+      id: upload-windows-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/getto_windows_amd64.tar.gz
+        asset_name: getto_windows_amd64.tar.gz
         asset_content_type: application/octet-stream
